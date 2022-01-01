@@ -1,0 +1,44 @@
+1. Use stemming and lemmatisation
+
+def utils_preprocess_text(text, flg_stemm=False, flg_lemm=True, lst_stopwords=None):
+    ## clean (convert to lowercase and remove punctuations and characters and then strip)
+    text = re.sub(r'[^\w\s]', '', str(text).lower().strip())
+            
+    ## Tokenize (convert from string to list)
+    lst_text = text.split()
+    ## remove Stopwords
+    if lst_stopwords is not None:
+        lst_text = [word for word in lst_text if word not in 
+                    lst_stopwords]
+                
+    ## Stemming (remove -ing, -ly, ...)
+    if flg_stemm == True:
+        ps = nltk.stem.porter.PorterStemmer()
+        lst_text = [ps.stem(word) for word in lst_text]
+                
+    ## Lemmatisation (convert the word into root word)
+    if flg_lemm == True:
+        lem = nltk.stem.wordnet.WordNetLemmatizer()
+        lst_text = [lem.lemmatize(word) for word in lst_text]
+            
+    ## back to string from list
+    text = " ".join(lst_text)
+    return text
+
+dtf["text_clean"] = dtf["text"].apply(lambda x: utils_preprocess_text(x, flg_stemm=False, flg_lemm=True, lst_stopwords))
+
+2. Word analysis (Feature Gen)
+
+dtf['word_count'] = dtf["text"].apply(lambda x: len(str(x).split(" ")))
+dtf['char_count'] = dtf["text"].apply(lambda x: sum(len(word) for word in str(x).split(" ")))
+dtf['sentence_count'] = dtf["text"].apply(lambda x: len(str(x).split(".")))
+dtf['avg_word_length'] = dtf['char_count'] / dtf['word_count']
+dtf['avg_sentence_lenght'] = dtf['word_count'] / dtf['sentence_count']
+
+
+
+
+REF:
+https://towardsdatascience.com/text-analysis-feature-engineering-with-nlp-502d6ea9225d
+
+
